@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Task Manager - Glassmorphism UI</title>
+<style>
+    body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #E9FFE6, #CFF5C2);
+        margin: 0;
+        padding: 40px;
+        min-height: 100vh;
+    }
+
+    h1 {
+        text-align: center;
+        color: #2F5D2F;
+        font-size: 40px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.3);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .container {
+        max-width: 900px;
+        margin: auto;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 25px;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 12px;
+        border: none;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(5px);
+        font-size: 15px;
+        transition: background 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        background: rgba(255, 255, 255, 0.7);
+        outline: none;
+    }
+
+    button {
+        background: linear-gradient(135deg, #7EDC74, #A8E6A3);
+        border: none;
+        padding: 12px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        margin-right: 10px;
+    }
+
+    button:hover {
+        background: linear-gradient(135deg, #6BCB63, #96D892);
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(126, 220, 116, 0.4);
+    }
+
+    .task {
+        border-left: 6px solid #7EDC74;
+        padding-left: 15px;
+        position: relative;
+    }
+
+    .task.completed {
+        border-left-color: #B0BEC5;
+        opacity: 0.7;
+    }
+
+    .task.completed .task-title {
+        text-decoration: line-through;
+        color: #888;
+    }
+
+    .task.completed .task-description {
+        text-decoration: line-through;
+        color: #aaa;
+    }
+
+    .task-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #2F5D2F;
+    }
+
+    .task-description {
+        color: #4A4A4A;
+        margin: 10px 0;
+    }
+
+    .task-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 15px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        color: #555;
+    }
+
+    .priority-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .priority-1 { background: #FF6B6B; }
+    .priority-2 { background: #FFA726; }
+    .priority-3 { background: #66BB6A; }
+
+    .completed-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        background: linear-gradient(135deg, #26A69A, #4DB6AC);
+    }
+
+    .pending-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        background: linear-gradient(135deg, #78909C, #90A4AE);
+    }
+
+    .reminder-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        background: linear-gradient(135deg, #7E57C2, #9575CD);
+    }
+
+    .task-buttons {
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .edit-btn {
+        background: linear-gradient(135deg, #2196F3, #64B5F6);
+    }
+
+    .edit-btn:hover {
+        background: linear-gradient(135deg, #1976D2, #42A5F5);
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+    }
+
+    .delete-btn {
+        background: linear-gradient(135deg, #F44336, #EF5350);
+    }
+
+    .delete-btn:hover {
+        background: linear-gradient(135deg, #D32F2F, #E53935);
+        box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+    }
+
+    .complete-btn {
+        background: linear-gradient(135deg, #26A69A, #4DB6AC);
+    }
+
+    .complete-btn:hover {
+        background: linear-gradient(135deg, #00897B, #26A69A);
+        box-shadow: 0 4px 15px rgba(38, 166, 154, 0.4);
+    }
+
+    .complete-btn:disabled {
+        background: linear-gradient(135deg, #B0BEC5, #CFD8DC);
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Checkbox Toggle */
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 12px 0;
+        font-size: 15px;
+        color: #2F5D2F;
+        font-weight: 500;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        margin: 0;
+        padding: 0;
+        accent-color: #6BCB63;
+        cursor: pointer;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 5% auto;
+        width: 90%;
+        max-width: 500px;
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        animation: modalFadeIn 0.3s ease;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #2F5D2F;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .modal input, .modal textarea, .modal select {
+        margin: 10px 0;
+    }
+
+    .modal-buttons {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: #666;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        body {
+            padding: 20px;
+        }
+    }
+</style>
+</head>
+<body>
+<h1>Task Manager</h1>
+<div class="container">
+    <div class="glass-card">
+        <h3>Add New Task</h3>
+        <input id="title" placeholder="Title" required>
+        <textarea id="description" placeholder="Description" rows="3"></textarea>
+        <div class="form-row">
+            <select id="priority">
+                <option value="1">Priority 1 (High)</option>
+                <option value="2">Priority 2 (Medium)</option>
+                <option value="3" selected>Priority 3 (Low)</option>
+            </select>
+            <input id="assignedTo" placeholder="Assigned To">
+        </div>
+        <div class="form-row">
+            <input id="reminder_date" type="datetime-local" placeholder="Reminder Date">
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="is_completed">
+                <label for="is_completed">Mark as Completed</label>
+            </div>
+        </div>
+        <button onclick="addTask()">Add Task</button>
+    </div>
+
+    <div class="grid" id="tasks"></div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-header">Edit Task</div>
+        <input id="edit-title" placeholder="Title" required>
+        <textarea id="edit-description" placeholder="Description" rows="3"></textarea>
+        <div class="form-row">
+            <select id="edit-priority">
+                <option value="1">Priority 1 (High)</option>
+                <option value="2">Priority 2 (Medium)</option>
+                <option value="3">Priority 3 (Low)</option>
+            </select>
+            <input id="edit-assignedTo" placeholder="Assigned To">
+        </div>
+        <div class="form-row">
+            <input id="edit-reminder_date" type="datetime-local" placeholder="Reminder Date">
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="edit-is_completed">
+                <label for="edit-is_completed">Mark as Completed</label>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button onclick="updateTask()">Update Task</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadTasks() {
+    try {
+        const res = await fetch('/tasks');
+        const data = await res.json();
+
+        const container = document.getElementById('tasks');
+        container.innerHTML = '';
+
+        data.forEach(task => {
+            const priorityClass = `priority-${task.priority}`;
+            const createdAt = new Date(task.created_at || task.createdAt).toLocaleString();
+            const isCompleted = task.is_completed || task.isCompleted || false;
+            const reminderDate = task.reminder_date || task.reminderDate;
+
+            let reminderHtml = '';
+            if (reminderDate) {
+                const reminderFormatted = new Date(reminderDate).toLocaleString();
+                reminderHtml = `<span class="reminder-badge">🔔 ${reminderFormatted}</span>`;
+            }
+
+            const statusBadge = isCompleted
+                ? '<span class="completed-badge">✅ Completed</span>'
+                : '<span class="pending-badge">⏳ Pending</span>';
+
+            const completedClass = isCompleted ? 'completed' : '';
+            const completeDisabled = isCompleted ? 'disabled' : '';
+            const completeText = isCompleted ? 'Completed' : 'Complete';
+
+            container.innerHTML += `
+                <div class="glass-card task ${completedClass}">
+                    <div class="task-title">${escapeHtml(task.title)}</div>
+                    <div class="task-description">${escapeHtml(task.description) || 'No description'}</div>
+                    <div class="task-meta">
+                        <span class="priority-badge ${priorityClass}">Priority ${task.priority}</span>
+                        ${statusBadge}
+                        ${reminderHtml}
+                    </div>
+                    <div class="task-meta">
+                        <span class="meta-item"><strong>👤 Assigned:</strong> ${escapeHtml(task.assignedTo || 'Unassigned')}</span>
+                        <span class="meta-item"><strong>📅 Created:</strong> ${createdAt}</span>
+                    </div>
+                    <div class="task-buttons">
+                        <button class="complete-btn" onclick="completeTask(${task.id})" ${completeDisabled}>${completeText}</button>
+                        <button class="edit-btn" onclick="openEditModal(${task.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error('Error loading tasks:', error);
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+async function addTask() {
+    const title = document.getElementById('title').value.trim();
+    if (!title) {
+        alert('Title is required');
+        return;
+    }
+
+    const priority = parseInt(document.getElementById('priority').value);
+    if (priority < 1 || priority > 3) {
+        alert('Priority must be between 1 and 3');
+        return;
+    }
+
+    const reminderDate = document.getElementById('reminder_date').value || null;
+    const isCompleted = document.getElementById('is_completed').checked;
+
+    const task = {
+        title: title,
+        description: document.getElementById('description').value,
+        priority: priority,
+        assignedTo: document.getElementById('assignedTo').value,
+        reminder_date: reminderDate,
+        is_completed: isCompleted
+    };
+
+    try {
+        const response = await fetch('/tasks', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(task)
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            alert(error.error || 'Error adding task');
+            return;
+        }
+
+        // Clear form
+        document.getElementById('title').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('priority').value = '3';
+        document.getElementById('assignedTo').value = '';
+        document.getElementById('reminder_date').value = '';
+        document.getElementById('is_completed').checked = false;
+
+        loadTasks();
+    } catch (error) {
+        console.error('Error adding task:', error);
+        alert('Error adding task');
+    }
+}
+
+async function completeTask(id) {
+    try {
+        const response = await fetch(`/tasks/${id}/complete`, {
+            method: 'PATCH'
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            alert(error.error || 'Error completing task');
+            return;
+        }
+
+        loadTasks();
+    } catch (error) {
+        console.error('Error completing task:', error);
+        alert('Error completing task');
+    }
+}
+
+async function updateTask() {
+    const title = document.getElementById('edit-title').value.trim();
+    if (!title) {
+        alert('Title is required');
+        return;
+    }
+
+    const priority = parseInt(document.getElementById('edit-priority').value);
+    if (priority < 1 || priority > 3) {
+        alert('Priority must be between 1 and 3');
+        return;
+    }
+
+    const reminderDate = document.getElementById('edit-reminder_date').value || null;
+    const isCompleted = document.getElementById('edit-is_completed').checked;
+
+    const task = {
+        title: title,
+        description: document.getElementById('edit-description').value,
+        priority: priority,
+        assignedTo: document.getElementById('edit-assignedTo').value,
+        reminder_date: reminderDate,
+        is_completed: isCompleted
+    };
+
+    try {
+        const response = await fetch(`/tasks/${currentEditId}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(task)
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            alert(error.error || 'Error updating task');
+            return;
+        }
+
+        closeModal();
+        loadTasks();
+    } catch (error) {
+        console.error('Error updating task:', error);
+        alert('Error updating task');
+    }
+}
+
+async function deleteTask(id) {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+
+    try {
+        const response = await fetch(`/tasks/${id}`, { method: 'DELETE' });
+        if (!response.ok) {
+            const error = await response.json();
+            alert(error.error || 'Error deleting task');
+            return;
+        }
+        loadTasks();
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        alert('Error deleting task');
+    }
+}
+
+let currentEditId = null;
+let tasksData = [];
+
+async function openEditModal(id) {
+    currentEditId = id;
+
+    // Fetch single task data to avoid escaping issues
+    try {
+        const res = await fetch(`/tasks/${id}`);
+        const task = await res.json();
+
+        document.getElementById('edit-title').value = task.title || '';
+        document.getElementById('edit-description').value = task.description || '';
+        document.getElementById('edit-priority').value = task.priority || 3;
+        document.getElementById('edit-assignedTo').value = task.assignedTo || '';
+
+        const reminderDate = task.reminder_date || task.reminderDate || '';
+        document.getElementById('edit-reminder_date').value = reminderDate ? reminderDate.slice(0, 16) : '';
+
+        const isCompleted = task.is_completed || task.isCompleted || false;
+        document.getElementById('edit-is_completed').checked = isCompleted;
+
+        document.getElementById('editModal').style.display = 'block';
+    } catch (error) {
+        console.error('Error fetching task:', error);
+        alert('Error fetching task details');
+    }
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+    currentEditId = null;
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('editModal');
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+
+// Load tasks on page load
+loadTasks();
+</script>
+</body>
+</html>
